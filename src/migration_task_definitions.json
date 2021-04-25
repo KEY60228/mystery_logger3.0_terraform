@@ -1,0 +1,33 @@
+[
+    {
+        "name": "nazolog-php-fpm",
+        "image": "php:7.4-fpm-alpine3.12",
+        "essential": true,
+        "cpu": 200,
+        "memory": null,
+        "memoryReservation": 600,
+        "command": ["php", "artisan", "migrate"],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "/ecs/nazolog",
+                "awslogs-stream-prefix": "nazolog-migration",
+                "awslogs-region": "ap-northeast-1"
+            }
+        },
+        "secrets": [
+            {
+                "name": "DB_HOST",
+                "valueFrom": "DB_HOST"
+            },
+            {
+                "name": "DB_USER",
+                "valueFrom": "DB_USER"
+            },
+            {
+                "name": "DB_PASSWORD",
+                "valueFrom": "DB_PASSWORD"
+            }
+        ]
+    }
+]

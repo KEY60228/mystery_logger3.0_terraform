@@ -1,0 +1,55 @@
+[
+    {
+        "name": "nazolog-nginx",
+        "image": "nginx:1.19-alpine",
+        "essential": true,
+        "portMappings": [
+            {
+                "hostPort": 0,
+                "protocol": "tcp",
+                "containerPort": 80
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "/ecs/nazolog",
+                "awslogs-stream-prefix": "nazolog-nginx",
+                "awslogs-region": "ap-northeast-1"
+            }
+        }
+    },
+    {
+        "name": "nazolog-php-fpm",
+        "image": "php:7.4-fpm-alpine3.12",
+        "essential": true,
+        "portMappings": [
+            {
+                "protocol": "tcp",
+                "containerPort": 9000
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "/ecs/nazolog",
+                "awslogs-stream-prefix": "nazolog-php-fpm",
+                "awslogs-region": "ap-northeast-1"
+            }
+        },
+        "secrets": [
+            {
+                "name": "DB_HOST",
+                "valueFrom": "DB_HOST"
+            },
+            {
+                "name": "DB_USER",
+                "valueFrom": "DB_USER"
+            },
+            {
+                "name": "DB_PASSWORD",
+                "valueFrom": "DB_PASSWORD"
+            }
+        ]
+    }
+]
