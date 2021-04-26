@@ -51,7 +51,7 @@ module "ec2_for_ecs_sg" {
 #     instance_type = "t2.micro"
 #     monitoring = true
 #     iam_instance_profile = aws_iam_instance_profile.nazolog_instance_profile.name
-#     subnet_id = aws_subnet.nazolog_private_subnet_1a.id
+#     subnet_id = aws_subnet.nazolog_public_subnet_1a.id
 #     user_data = file("./user_data.sh")
 #     associate_public_ip_address = false
 
@@ -67,7 +67,6 @@ module "ec2_for_ecs_sg" {
 resource "aws_launch_template" "nazolog_asg_config" {
     image_id = "ami-0e37e42dff65024ae"
     instance_type = "t2.micro"
-    # vpc_security_group_ids = [ module.ec2_for_ecs_sg.security_group_id ]
     user_data = base64encode(templatefile("./user_data.sh",
     {
         CLUSTER_NAME = aws_ecs_cluster.nazolog_ecs_cluster.name
@@ -78,12 +77,11 @@ resource "aws_launch_template" "nazolog_asg_config" {
     }
 
     iam_instance_profile {
-        # name = aws_iam_instance_profile.nazolog_instance_profile.name
         arn = aws_iam_instance_profile.nazolog_instance_profile.arn
     }
 
     network_interfaces {
-        associate_public_ip_address = false
+        associate_public_ip_address = true
         security_groups = [ module.ec2_for_ecs_sg.security_group_id ]
     }
 
@@ -104,8 +102,8 @@ resource "aws_launch_template" "nazolog_asg_config" {
 resource "aws_autoscaling_group" "nazolog_asg" {
     name = "nazolog-asg"
     vpc_zone_identifier = [
-        aws_subnet.nazolog_private_subnet_1a.id,
-        aws_subnet.nazolog_private_subnet_1c.id,
+        aws_subnet.nazolog_public_subnet_1a.id,
+        aws_subnet.nazolog_public_subnet_1c.id,
     ]
 
     launch_template {
@@ -195,6 +193,7 @@ data "aws_iam_policy_document" "ecs_task" {
 # ECSクラスタ
 resource "aws_ecs_cluster" "nazolog_ecs_cluster" {
     name = "nazolog-ecs-cluster"
+    capacity_providers = [ aws_ecs_capacity_provider.nazolog_capacity_provider.name ]
 }
 
 # ECSサービス
