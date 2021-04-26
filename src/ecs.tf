@@ -37,13 +37,38 @@ resource "aws_iam_instance_profile" "nazolog_instance_profile" {
 }
 
 # EC2インスタンス用Security Group
-module "ec2_for_ecs_sg" {
-    source = "./security_group"
-    name = "ec2-for-ecs-sg"
+# module "ec2_for_ecs_sg" {
+#     source = "./security_group"
+#     name = "ec2-for-ecs-sg"
+#     vpc_id = aws_vpc.nazolog_vpc.id
+#     port = 80
+#     cidr_blocks = [aws_vpc.nazolog_vpc.cidr_block]
+# }
+
+### module security_groupを外出し ###
+resource "aws_security_group" "ec2_for_ecs_instance_sg" {
+    name = "ec2-for-ecs-instance-sg"
     vpc_id = aws_vpc.nazolog_vpc.id
-    port = 80
-    cidr_blocks = [aws_vpc.nazolog_vpc.cidr_block]
 }
+
+resource "aws_security_group_rule" "ingress" {
+    type = "ingress"
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
+    source_security_group_id = module.https_sg.security_group_id
+    security_group_id = aws_security_group.ec2_for_ecs_instance_sg.id
+}
+
+resource "aws_security_group_rule" "egress" {
+    type = "egress"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [ "0.0.0.0/0" ]
+    security_group_id = aws_security_group.ec2_for_ecs_instance_sg.id
+}
+### module security_groupを外出し ###
 
 # # EC2インスタンス
 # resource "aws_instance" "nazolog-ec2-instance" {
@@ -82,7 +107,7 @@ resource "aws_launch_template" "nazolog_asg_config" {
 
     network_interfaces {
         associate_public_ip_address = true
-        security_groups = [ module.ec2_for_ecs_sg.security_group_id ]
+        security_groups = [ aws_security_group.ec2_for_ecs_instance_sg.id ]
     }
 
     block_device_mappings {
