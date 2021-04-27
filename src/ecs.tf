@@ -92,10 +92,7 @@ resource "aws_security_group_rule" "egress" {
 resource "aws_launch_template" "nazolog_asg_config" {
     image_id = "ami-0e37e42dff65024ae"
     instance_type = "t2.micro"
-    user_data = base64encode(templatefile("./user_data.sh",
-    {
-        CLUSTER_NAME = aws_ecs_cluster.nazolog_ecs_cluster.name
-    }))
+    user_data = base64encode(file("./user_data.sh"))
 
     monitoring {
         enabled = true
@@ -153,7 +150,7 @@ resource "aws_ecs_capacity_provider" "nazolog_capacity_provider" {
             maximum_scaling_step_size = 100
             minimum_scaling_step_size = 1
             status = "ENABLED"
-            target_capacity = 80
+            target_capacity = 100
         }
     }
 }

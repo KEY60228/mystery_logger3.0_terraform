@@ -40,15 +40,15 @@
         "secrets": [
             {
                 "name": "DB_HOST",
-                "valueFrom": "DB_HOST"
+                "valueFrom": "/nazolog/laravel/db_host"
             },
             {
-                "name": "DB_USER",
-                "valueFrom": "DB_USER"
+                "name": "DB_USERNAME",
+                "valueFrom": "/nazolog/laravel/db_username"
             },
             {
                 "name": "DB_PASSWORD",
-                "valueFrom": "DB_PASSWORD"
+                "valueFrom": "/nazolog/laravel/db_password"
             }
         ]
     }

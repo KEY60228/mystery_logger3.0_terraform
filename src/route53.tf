@@ -76,7 +76,7 @@ resource "aws_route53_record" "nazolog_cert_images" {
 # DNSレコード (mail)
 resource "aws_route53_record" "nazolog_mail_route53_record" {
     zone_id = aws_route53_zone.nazolog_route53_hostzone.zone_id
-    name = "_amazonses.${aws_route53_zone.nazolog_route53_hostzone.name}"
+    name = "_amazonses.mail.${aws_route53_zone.nazolog_route53_hostzone.name}"
     type = "TXT"
     ttl = "600"
     records = [ aws_ses_domain_identity.nazolog_ses.verification_token ]
@@ -86,7 +86,7 @@ resource "aws_route53_record" "nazolog_mail_route53_record" {
 resource "aws_route53_record" "nazolog_dkim_route53_record" {
     count = 3
     zone_id = aws_route53_zone.nazolog_route53_hostzone.zone_id
-    name = "${element(aws_ses_domain_dkim.nazolog_dkim.dkim_tokens, count.index)}._domainkey.${aws_route53_zone.nazolog_route53_hostzone.name}"
+    name = "${element(aws_ses_domain_dkim.nazolog_dkim.dkim_tokens, count.index)}._domainkey.mail.${aws_route53_zone.nazolog_route53_hostzone.name}"
     type = "CNAME"
     ttl = "600"
     records = [ "${element(aws_ses_domain_dkim.nazolog_dkim.dkim_tokens, count.index)}.dkim.amazonses.com" ]
