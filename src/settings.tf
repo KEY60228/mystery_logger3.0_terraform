@@ -66,3 +66,18 @@ resource "aws_iam_user_policy_attachment" "circleci_attachment" {
     user = aws_iam_user.circleci_user.name
     policy_arn = aws_iam_policy.circleci_policy.arn
 }
+
+# ACCESS KEYの発行
+resource "aws_iam_access_key" "nazolog_circleci_key" {
+    user = aws_iam_user.circleci_user.name
+}
+
+output "aws_iam_circleci_access_key" {
+    value     = aws_iam_access_key.nazolog_circleci_key.id
+    sensitive = true
+}
+
+output "aws_iam_circleci_secret" {
+    value     = aws_iam_access_key.nazolog_circleci_key.secret
+    sensitive = true
+}
