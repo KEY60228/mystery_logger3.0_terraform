@@ -15,7 +15,7 @@ resource "aws_db_parameter_group" "nazolog_db_parameter" {
 
 # DBサブネットグループ
 resource "aws_db_subnet_group" "nazolog_db_subnet" {
-    name = "nazolog-db-subner"
+    name = "nazolog-db-subnet"
     subnet_ids = [
         aws_subnet.nazolog_private_subnet_1a.id,
         aws_subnet.nazolog_private_subnet_1c.id,
@@ -24,6 +24,7 @@ resource "aws_db_subnet_group" "nazolog_db_subnet" {
 
 # DBインスタンス
 resource "aws_db_instance" "nazolog_db" {
+    name = "nazolog_db"
     identifier = "nazolog-db"
     engine = "postgres"
     engine_version = "12.3"
@@ -50,7 +51,7 @@ resource "aws_db_instance" "nazolog_db" {
     db_subnet_group_name = aws_db_subnet_group.nazolog_db_subnet.name
 
     lifecycle {
-        ignore_changes = [ username, password ]
+        ignore_changes = [ password ]
     }
 }
 
