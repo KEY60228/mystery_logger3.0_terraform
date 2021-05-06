@@ -191,7 +191,7 @@ resource "aws_ssm_parameter" "nazolog_laravel_mail_host" {
 
 resource "aws_ssm_parameter" "nazolog_laravel_mail_port" {
     name = "/nazolog/laravel/mail_port"
-    value = "587"
+    value = "2587"
     type = "String"
     description = "MAIL_PORT"
 }
@@ -227,7 +227,7 @@ resource "aws_ssm_parameter" "nazolog_laravel_mail_encryption" {
 
 resource "aws_ssm_parameter" "nazolog_laravel_mail_from_address" {
     name = "/nazolog/laravel/mail_from_address"
-    value = "info@mystery-logger.com"
+    value = "info@mail.mystery-logger.com"
     type = "String"
     description = "MAIL_FROM_ADDRESS"
 }
@@ -239,12 +239,18 @@ resource "aws_ssm_parameter" "nazolog_laravel_mail_from_name" {
     description = "MAIL_FROM_NAME"
 }
 
-### CLIENT
-resource "aws_ssm_parameter" "nazolog_google_map_api_key" {
-    name = "/nazolog/api_key/google_map"
-    value = "ExampleApiKey"
+resource "aws_ssm_parameter" "nazolog_laravel_aws_default_region" {
+    name = "/nazolog/laravel/aws_default_region"
+    value = "ap-northeast-1"
+    type = "String"
+    description = "AWS_DEFAULT_REGION"
+}
+
+resource "aws_ssm_parameter" "nazolog_laravel_aws_image_bucket" {
+    name = "/nazolog/laravel/aws_image_bucket"
+    value = "ExampleBucket"
     type = "SecureString"
-    description = "Google Maps用API KEY"
+    description = "AWS_BUCKET"
 
     lifecycle {
         ignore_changes = [ value ]
