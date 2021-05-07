@@ -1,14 +1,45 @@
 [
     {
-        "name": "nazolog-php-fpm-migration",
-        "image": "736244091533.dkr.ecr.ap-northeast-1.amazonaws.com/nazolog-ecr-php:latest",
+        "name": "nazolog-nginx",
+        "image": "736244091533.dkr.ecr.ap-northeast-1.amazonaws.com/nazolog-ecr-nginx:latest",
         "essential": true,
-        "command": ["php", "artisan", "migrate", "--force"],
+        "portMappings": [
+            {
+                "hostPort": 0,
+                "protocol": "tcp",
+                "containerPort": 80
+            }
+        ],
+        "mountPoints": [
+            {
+                "sourceVolume": "nazolog",
+                "containerPath": "/var/run/php-fpm"
+            }
+        ],
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
                 "awslogs-group": "/ecs/nazolog",
-                "awslogs-stream-prefix": "nazolog-migration",
+                "awslogs-stream-prefix": "nazolog-nginx",
+                "awslogs-region": "ap-northeast-1"
+            }
+        }
+    },
+    {
+        "name": "nazolog-php-fpm",
+        "image": "736244091533.dkr.ecr.ap-northeast-1.amazonaws.com/nazolog-ecr-php:latest",
+        "essential": true,
+        "mountPoints": [
+            {
+                "sourceVolume": "nazolog",
+                "containerPath": "/var/run/php-fpm"
+            }
+        ],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-group": "/ecs/nazolog",
+                "awslogs-stream-prefix": "nazolog-php-fpm",
                 "awslogs-region": "ap-northeast-1"
             }
         },

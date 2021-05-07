@@ -135,6 +135,8 @@ resource "aws_autoscaling_group" "nazolog_asg" {
 
     min_size = 1
     max_size = 10
+
+    # protect_from_scale_in = false
     protect_from_scale_in = true
 }
 
@@ -207,6 +209,13 @@ data "aws_iam_policy_document" "ecs_task" {
             "logs:PutLogEvents",
             "ses:SendEmail",
             "ses:SendRawEmail",
+            "s3:ListBucket",
+            "s3:GetObject",
+            "s3:GetObjectAcl",
+            "s3:PutObject",
+            "s3:PutObjectAcl",
+            "s3:ReplicateObject",
+            "s3:DeleteObject",
         ]
         resources = [ "*" ]
     }
@@ -216,6 +225,12 @@ data "aws_iam_policy_document" "ecs_task" {
 resource "aws_ecs_cluster" "nazolog_ecs_cluster" {
     name = "nazolog-ecs-cluster"
     capacity_providers = [ aws_ecs_capacity_provider.nazolog_capacity_provider.name ]
+
+    default_capacity_provider_strategy {
+        capacity_provider = aws_ecs_capacity_provider.nazolog_capacity_provider.name
+        base = 1
+        weight = 1
+    }
 }
 
 # ECSサービス
@@ -246,18 +261,87 @@ resource "aws_ecs_service" "nazolog_ecs_service" {
 # タスク定義リソース
 resource "aws_ecs_task_definition" "nazolog_ecs_task_definition" {
     family = "nazolog-task"
-    cpu = "256"
-    memory = "512"
-    container_definitions = file("./tmp_container_definitions.json")
+    cpu = "1024"
+    memory = "983"
+    container_definitions = file("./container_definitions.json")
     task_role_arn = module.ecs_task_role.iam_role_arn
     execution_role_arn = module.ecs_task_execution_role.iam_role_arn
     network_mode = "bridge"
+
+    volume {
+        name = "nazolog"
+        docker_volume_configuration {
+            scope = "task"
+            driver = "local"
+        }
+    }
 }
 
 # デプロイ時にmigrationするタスク
 resource "aws_ecs_task_definition" "nazolog_ecs_migrate_task" {
-    family = "nazolog-task"
+    family = "nazolog-migrate-task"
+    cpu = "1024"
+    memory = "983"
     container_definitions = file("./migration_task_definitions.json")
     execution_role_arn = module.ecs_task_role.iam_role_arn
     network_mode = "bridge"
+}
+
+# ECS Service Auto Scaling設定 (タスクの増減)
+resource "aws_appautoscaling_target" "nazolog_ecs_service_autoscaling_target" {
+    service_namespace = "ecs"
+    resource_id = "service/nazolog-ecs-cluster/nazolog-ecs-service"
+    scalable_dimension = "ecs:service:DesiredCount"
+    role_arn = data.aws_iam_role.nazolog_ecs_service_autoscaling_role.arn
+    min_capacity = 1
+    max_capacity = 10
+
+    depends_on = [ aws_ecs_service.nazolog_ecs_service ]
+}
+
+# Scale out ポリシー
+resource "aws_appautoscaling_policy" "nazolog_ecs_service_autoscaling_out_policy" {
+    name = "nazolog-ecs-service-autoscaling-out-policy"
+    service_namespace = "ecs"
+    resource_id = "service/nazolog-ecs-cluster/nazolog-ecs-service"
+    scalable_dimension = "ecs:service:DesiredCount"
+
+    step_scaling_policy_configuration {
+        adjustment_type = "ChangeInCapacity"
+        cooldown = 600
+        metric_aggregation_type = "Average"
+
+        step_adjustment {
+            metric_interval_lower_bound = 0
+            scaling_adjustment = 1
+        }
+    }
+
+    depends_on = [ aws_appautoscaling_target.nazolog_ecs_service_autoscaling_target ]
+}
+
+# Scale in ポリシー
+resource "aws_appautoscaling_policy" "nazolog_ecs_service_autoscaling_in_policy" {
+    name = "nazolog-ecs-service-autoscaling-in-policy"
+    service_namespace = "ecs"
+    resource_id = "service/nazolog-ecs-cluster/nazolog-ecs-service"
+    scalable_dimension = "ecs:service:DesiredCount"
+
+    step_scaling_policy_configuration {
+        adjustment_type = "ChangeInCapacity"
+        cooldown = 600
+        metric_aggregation_type = "Average"
+
+        step_adjustment {
+            metric_interval_upper_bound = 0
+            scaling_adjustment = -1
+        }
+    }
+
+    depends_on = [ aws_appautoscaling_target.nazolog_ecs_service_autoscaling_target ]
+}
+
+# AutoScaling用IAM role
+data "aws_iam_role" "nazolog_ecs_service_autoscaling_role" {
+    name = "AWSServiceRoleForApplicationAutoScaling_ECSService"
 }

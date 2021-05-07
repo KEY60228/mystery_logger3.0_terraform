@@ -107,6 +107,7 @@ resource "aws_s3_bucket_public_access_block" "nazolog_cloudfront_log" {
 # 画像用S3
 resource "aws_s3_bucket" "nazolog_s3_images" {
     bucket = "nazolog-s3-images"
+    acl = "private"
 
     versioning {
         enabled = true
@@ -123,6 +124,15 @@ resource "aws_s3_bucket" "nazolog_s3_images" {
     tags = {
         Name = "nazolog-s3-images"
     }
+}
+
+# nazolog_imagesのaccess blockリソース
+resource "aws_s3_bucket_public_access_block" "nazolog_s3_images" {
+    bucket = aws_s3_bucket.nazolog_s3_images.id
+    block_public_acls = true
+    block_public_policy = true
+    ignore_public_acls = true
+    restrict_public_buckets = true
 }
 
 # ポリシーとバケットのアタッチ (for cloudfront)
