@@ -135,6 +135,9 @@ resource "aws_autoscaling_group" "nazolog_asg" {
 
     min_size = 1
     max_size = 10
+
+    # protect_from_scale_in = false
+    protect_from_scale_in = true
 }
 
 # AutoScaling用capacity provider
@@ -206,6 +209,13 @@ data "aws_iam_policy_document" "ecs_task" {
             "logs:PutLogEvents",
             "ses:SendEmail",
             "ses:SendRawEmail",
+            "s3:ListBucket",
+            "s3:GetObject",
+            "s3:GetObjectAcl",
+            "s3:PutObject",
+            "s3:PutObjectAcl",
+            "s3:ReplicateObject",
+            "s3:DeleteObject",
         ]
         resources = [ "*" ]
     }
@@ -215,6 +225,12 @@ data "aws_iam_policy_document" "ecs_task" {
 resource "aws_ecs_cluster" "nazolog_ecs_cluster" {
     name = "nazolog-ecs-cluster"
     capacity_providers = [ aws_ecs_capacity_provider.nazolog_capacity_provider.name ]
+
+    default_capacity_provider_strategy {
+        capacity_provider = aws_ecs_capacity_provider.nazolog_capacity_provider.name
+        base = 1
+        weight = 1
+    }
 }
 
 # ECSサービス
@@ -247,15 +263,25 @@ resource "aws_ecs_task_definition" "nazolog_ecs_task_definition" {
     family = "nazolog-task"
     cpu = "1024"
     memory = "983"
-    container_definitions = file("./tmp_container_definitions.json")
+    container_definitions = file("./container_definitions.json")
     task_role_arn = module.ecs_task_role.iam_role_arn
     execution_role_arn = module.ecs_task_execution_role.iam_role_arn
     network_mode = "bridge"
+
+    volume {
+        name = "nazolog"
+        docker_volume_configuration {
+            scope = "task"
+            driver = "local"
+        }
+    }
 }
 
 # デプロイ時にmigrationするタスク
 resource "aws_ecs_task_definition" "nazolog_ecs_migrate_task" {
-    family = "nazolog-task"
+    family = "nazolog-migrate-task"
+    cpu = "1024"
+    memory = "983"
     container_definitions = file("./migration_task_definitions.json")
     execution_role_arn = module.ecs_task_role.iam_role_arn
     network_mode = "bridge"
