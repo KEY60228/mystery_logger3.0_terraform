@@ -48,14 +48,17 @@ data "aws_iam_policy_document" "circleci_policy" {
             "ecr:PutImage",
             "ecs:DescribeServices",
             "ecs:DescribeTaskDefinition",
-            "ecs:RegistertaskDefinition",
+            "ecs:RegisterTaskDefinition",
             "ecs:UpdateService",
             "ecs:RunTask",
             "ecs:DescribeTasks",
             "ecs:ListTasks",
             "logs:CreateLogGroup",
             "logs:CreateLogStream",
-            "logs:PutLogEvents"
+            "logs:PutLogEvents",
+            "iam:Get*",
+            "iam:List*",
+            "iam:PassRole"
         ]
         resources = [ "*" ]
     }
