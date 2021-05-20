@@ -125,7 +125,7 @@ resource "aws_autoscaling_group" "nazolog_asg" {
     name = "nazolog-asg"
     vpc_zone_identifier = [
         aws_subnet.nazolog_public_subnet_1a.id,
-        aws_subnet.nazolog_public_subnet_1c.id,
+        # aws_subnet.nazolog_public_subnet_1c.id,
     ]
 
     launch_template {
