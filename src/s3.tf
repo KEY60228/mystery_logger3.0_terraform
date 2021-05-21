@@ -154,27 +154,3 @@ data "aws_iam_policy_document" "nazolog_s3_images_policy_for_cloudfront" {
         }
     }
 }
-
-# ポリシーとバケットのアタッチ (for ecs)
-resource "aws_s3_bucket_policy" "nazolog_s3_images_policy_for_ecs" {
-    bucket = aws_s3_bucket.nazolog_s3_images.id
-    policy = data.aws_iam_policy_document.nazolog_s3_images_policy_for_ecs.json
-}
-
-# 画像用S3ポリシー (for ecs)
-data "aws_iam_policy_document" "nazolog_s3_images_policy_for_ecs" {
-    statement {
-        effect = "Allow"
-        actions = [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:DeleteObject",
-        ]
-        resources = [ "arn:aws:s3:::${aws_s3_bucket.nazolog_s3_images.id}/*" ]
-
-        principals {
-            type = "AWS"
-            identifiers = [ module.ecs_task_role.iam_role_arn ]
-        }
-    }
-}

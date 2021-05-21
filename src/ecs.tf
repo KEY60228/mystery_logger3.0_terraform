@@ -125,7 +125,7 @@ resource "aws_autoscaling_group" "nazolog_asg" {
     name = "nazolog-asg"
     vpc_zone_identifier = [
         aws_subnet.nazolog_public_subnet_1a.id,
-        aws_subnet.nazolog_public_subnet_1c.id,
+        # aws_subnet.nazolog_public_subnet_1c.id,
     ]
 
     launch_template {
@@ -136,8 +136,8 @@ resource "aws_autoscaling_group" "nazolog_asg" {
     min_size = 1
     max_size = 10
 
-    # protect_from_scale_in = false
-    protect_from_scale_in = true
+    # protect_from_scale_in = true
+    protect_from_scale_in = false
 }
 
 # AutoScaling用capacity provider
@@ -146,7 +146,8 @@ resource "aws_ecs_capacity_provider" "nazolog_capacity_provider" {
 
     auto_scaling_group_provider {
         auto_scaling_group_arn = aws_autoscaling_group.nazolog_asg.arn
-        managed_termination_protection = "ENABLED"
+        # managed_termination_protection = "ENABLED"
+        managed_termination_protection = "DISABLED"
 
         managed_scaling {
             maximum_scaling_step_size = 100
