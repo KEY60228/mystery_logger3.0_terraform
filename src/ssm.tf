@@ -115,7 +115,7 @@ resource "aws_ssm_parameter" "nazolog_laravel_cache_driver" {
 
 resource "aws_ssm_parameter" "nazolog_laravel_queue_connection" {
     name = "/nazolog/laravel/queue_connection"
-    value = "sync"
+    value = "sqs"
     type = "String"
     description = "QUEUE_CONNECTION"
 }
@@ -251,6 +251,17 @@ resource "aws_ssm_parameter" "nazolog_laravel_aws_image_bucket" {
     value = "ExampleBucket"
     type = "SecureString"
     description = "AWS_BUCKET"
+
+    lifecycle {
+        ignore_changes = [ value ]
+    }
+}
+
+resource "aws_ssm_parameter" "nazolog_laravel_aws_sqs_url" {
+    name = "/nazolog/laravel/aws_sqs_url"
+    value = "ExampleSQS"
+    type = "SecureString"
+    description = "AWS_SQS_URL"
 
     lifecycle {
         ignore_changes = [ value ]

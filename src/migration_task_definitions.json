@@ -1,7 +1,7 @@
 [
     {
         "name": "nazolog-php-fpm-migration",
-        "image": "736244091533.dkr.ecr.ap-northeast-1.amazonaws.com/nazolog-ecr-php:latest",
+        "image": "736244091533.dkr.ecr.ap-northeast-1.amazonaws.com/nazolog-ecr-php:83a875bdeced1a89fcefab1a9a074472f754759a",
         "essential": true,
         "command": ["php", "artisan", "migrate", "--force"],
         "logConfiguration": {
@@ -132,6 +132,10 @@
             {
                 "name": "APP_CLIENT_URL",
                 "valueFrom": "/nazolog/url/client"
+            },
+            {
+                "name": "AWS_SQS_URL",
+                "valueFrom": "/nazolog/laravel/aws_sqs_url"
             }
         ]
     }

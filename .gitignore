@@ -4,3 +4,6 @@ src/.terraform/
 src/.terraform.lock.hcl
 src/terraform.tfstate
 src/terraform.tfstate.backup
+
+src/func/mail
+src/func/mail.zip
