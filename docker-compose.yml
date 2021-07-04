@@ -10,3 +10,10 @@ services:
       - ./src:/terraform
     tty: true
     entrypoint: "/bin/ash"
+  golang:
+    image: golang:1.16
+    working_dir: /golang
+    volumes:
+      - ./src/func:/golang
+    tty: true
+    entrypoint: "/bin/bash"
