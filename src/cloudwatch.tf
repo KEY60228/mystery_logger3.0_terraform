@@ -41,3 +41,9 @@ resource "aws_cloudwatch_metric_alarm" "nazolog_ecs_service_cpu_low" {
 
     alarm_actions = [ aws_appautoscaling_policy.nazolog_ecs_service_autoscaling_in_policy.arn ]
 }
+
+# lambdaのログ収集リソース
+resource "aws_cloudwatch_log_group" "nazolog_lambda_logs" {
+    name = "/lambda/nazolog"
+    retention_in_days = 30
+}
