@@ -210,6 +210,7 @@ data "aws_iam_policy_document" "ecs_task" {
             "logs:PutLogEvents",
             "ses:SendEmail",
             "ses:SendRawEmail",
+            "sqs:SendMessage",
             "sqs:CreateQueue",
             "sqs:DeleteQueue",
             "sqs:ListQueue",
