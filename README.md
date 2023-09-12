@@ -29,10 +29,10 @@
 ## 使用技術
 
 開発環境アーキテクチャ図
-![開発環境アーキテクチャ図](https://images.mystery-logger.com/development_arch.PNG)
+![開発環境アーキテクチャ図](https://github.com/KEY60228/mystery_logger3.0_api/assets/56732734/a99da8d5-71d9-4ebf-8051-3eb86eaf3255)
 
 本番環境アーキテクチャ図
-![本番環境アーキテクチャ図](https://images.mystery-logger.com/production_arch.PNG)
+![本番環境アーキテクチャ図](https://github.com/KEY60228/mystery_logger3.0_api/assets/56732734/a7262dce-7d29-4225-852f-58fd4b55708b)
 
 ### バックエンド
 
@@ -61,10 +61,10 @@
 - Postman
 
 Figmaデザイン1
-![Figmaデザイン1](https://images.mystery-logger.com/Figma1.PNG)
+![Figmaデザイン1](https://github.com/KEY60228/mystery_logger3.0_api/assets/56732734/cb1ce4bf-2712-4f53-bb87-90f83247028d)
 
 Figmaデザイン2
-![Figmaデザイン2](https://images.mystery-logger.com/Figma2.PNG)
+![Figmaデザイン2](https://github.com/KEY60228/mystery_logger3.0_api/assets/56732734/2065fd77-8b9f-4e6f-971a-dcdd7faa3e04)
 
 ## テストユーザー
 
